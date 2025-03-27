@@ -25,7 +25,12 @@ const Login = () => {
       const userCredential = await signInWithEmailAndPassword(auth, username, password);
       const firebaseUser = userCredential.user;
       setUser(firebaseUser)
-      router.push("/add_user");
+      if(firebaseUser.email === "rudalph.gonsalves@medisense.com"){
+        router.push("/add_user");
+      }else{
+        router.push("/user_idcard");
+      }
+      
     } catch (error) {
       console.error("Login error:", error);
       alert("Login failed. Please try again.");
