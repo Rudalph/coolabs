@@ -11,9 +11,9 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "My Next.js App",
-  description: "This is a Next.js application with authentication.",
-  icons: "/favicon.ico", // Ensures favicon is correctly set
+  title: "CooLabs",
+  description: "Seamless Collaboration, Simplified",
+  icons: "/favicon.ico", 
 };
 
 export default function RootLayout({
