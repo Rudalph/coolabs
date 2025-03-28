@@ -13,18 +13,21 @@ import {
   User
 } from 'lucide-react';
 
+import AllTasks from "@/components/AllTasks"
+import ChatSection from "@/components/ChatSection"
+
 
 const Sidebar = ({ children }) => {
   const [isOpen, setIsOpen] = useState(true);
-  const [activeItem, setActiveItem] = useState('Dashboard');
+  const [activeItem, setActiveItem] = useState('AllTasks');
 
-//   const componentMap = {
-//     'Dashboard': <Dashboard />,
-//     'Calendar': <CalendarComponent />,
-//     'Team': <TeamComponent />,
-//     'Messages': <MessagesComponent />,
-//     'Settings': <SettingsComponent />
-//   };
+  const componentMap = {
+    'AllTasks': <AllTasks />,
+    'ChatSection': <ChatSection />,
+    // 'Team': <TeamComponent />,
+    // 'Messages': <MessagesComponent />,
+    // 'Settings': <SettingsComponent />
+  };
 
   const SidebarItem = ({ icon: Icon, text, active, onClick }) => (
     <div 
@@ -223,7 +226,7 @@ const Sidebar = ({ children }) => {
               icon={Calendar} 
               text="Calendar" 
               active={activeItem === 'Calendar'}
-              onClick={() => setActiveItem('Calendar')}
+              onClick={() => setActiveItem('ChatSection')}
             />
             <SidebarItem 
               icon={Users} 
@@ -276,13 +279,13 @@ const Sidebar = ({ children }) => {
           transition-all 
           duration-500 
           ease-in-out
-          ${isOpen ? 'ml-64' : 'ml-20'}
+          
           overflow-y-auto
           p-6
         `}
       >
-        {children}
-        {/* {componentMap[activeItem]} */}
+        {/* {children} */}
+        {componentMap[activeItem]}
       </main>
     </div>
   );
