@@ -1,0 +1,291 @@
+import React, { useState } from 'react';
+import { 
+  Home, 
+  Calendar, 
+  Settings, 
+  Users, 
+  MessageSquare, 
+  ChevronRight, 
+  ChevronLeft,
+  LogOut,
+  Bell,
+  Search,
+  User
+} from 'lucide-react';
+
+
+const Sidebar = ({ children }) => {
+  const [isOpen, setIsOpen] = useState(true);
+  const [activeItem, setActiveItem] = useState('Dashboard');
+
+//   const componentMap = {
+//     'Dashboard': <Dashboard />,
+//     'Calendar': <CalendarComponent />,
+//     'Team': <TeamComponent />,
+//     'Messages': <MessagesComponent />,
+//     'Settings': <SettingsComponent />
+//   };
+
+  const SidebarItem = ({ icon: Icon, text, active, onClick }) => (
+    <div 
+      className={`
+        flex items-center 
+        px-4 py-3 
+        cursor-pointer 
+        group 
+        transition-all 
+        duration-300 
+        ${active 
+          ? 'bg-gray-200 text-black' 
+          : 'text-gray-700 hover:bg-gray-100'}
+        rounded-lg 
+        mx-2 
+        my-1
+      `}
+      onClick={onClick}
+    >
+      <Icon 
+        className={`
+          w-6 h-6 
+          transition-all 
+          duration-300 
+          ${active ? 'text-black' : 'text-gray-600 group-hover:text-black'}
+        `} 
+      />
+      {isOpen && (
+        <span 
+          className={`
+            ml-4 
+            text-sm 
+            font-medium 
+            transition-all 
+            duration-300 
+            ${active ? 'text-black' : 'text-gray-800 group-hover:text-black'}
+          `}
+        >
+          {text}
+        </span>
+      )}
+    </div>
+  );
+
+  const Header = () => (
+    <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      {isOpen ? (
+        <div className="flex items-center">
+          <div 
+            className="
+              w-10 h-10 
+              bg-black 
+              rounded-full 
+              flex 
+              items-center 
+              justify-center 
+              text-white 
+              font-bold
+            "
+          >
+            C
+          </div>
+          <span className="ml-3 text-lg font-semibold text-black">CooLabs</span>
+        </div>
+      ) : (
+        <div 
+          className="
+            w-10 h-10 
+            bg-black 
+            rounded-full 
+            flex 
+            items-center 
+            justify-center 
+            text-white 
+            font-bold
+            mx-auto
+          "
+        >
+          A
+        </div>
+      )}
+    </div>
+  );
+
+  const SearchBar = () => (
+    <div 
+      className={`
+        mx-2 my-4 
+        transition-all 
+        duration-300 
+        ${isOpen ? 'px-2' : 'px-0'}
+      `}
+    >
+      {isOpen ? (
+        <div 
+          className="
+            flex 
+            items-center 
+            bg-gray-100 
+            rounded-full 
+            px-4 
+            py-2 
+            space-x-3
+          "
+        >
+          <Search className="w-5 h-5 text-gray-600" />
+          <input 
+            type="text" 
+            placeholder="Search" 
+            className="
+              bg-transparent 
+              outline-none 
+              text-sm 
+              w-full 
+              text-black
+            " 
+          />
+        </div>
+      ) : (
+        <div 
+          className="
+            flex 
+            items-center 
+            justify-center 
+            bg-gray-100 
+            rounded-full 
+            p-2 
+            mx-auto
+          "
+        >
+          <Search className="w-5 h-5 text-gray-600" />
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="flex h-screen bg-white overflow-hidden">
+      {/* Sidebar */}
+      <div 
+        className={`
+          bg-white 
+          shadow-xl 
+          border-r 
+          border-gray-200 
+          h-full 
+          flex 
+          flex-col 
+          transition-all 
+          duration-500 
+          ease-in-out
+          ${isOpen ? 'w-64' : 'w-20'}
+          relative
+        `}
+      >
+        {/* Toggle Button */}
+        <button 
+          onClick={() => setIsOpen(!isOpen)}
+          className="
+            absolute 
+            top-4 
+            -right-4 
+            bg-white 
+            border 
+            border-gray-200 
+            rounded-full 
+            p-2 
+            shadow-lg 
+            hover:bg-gray-100 
+            z-10
+            transition-all
+            duration-300
+            hover:scale-105
+          "
+        >
+          {isOpen ? <ChevronLeft className="text-black" /> : <ChevronRight className="text-black" />}
+        </button>
+
+        {/* Sidebar Content */}
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <Header />
+
+          {/* Search Bar */}
+          <SearchBar />
+
+          {/* Navigation */}
+          <nav className="flex-grow px-2 overflow-y-auto">
+            <SidebarItem 
+              icon={Home} 
+              text="Dashboard" 
+              active={activeItem === 'Dashboard'}
+              onClick={() => setActiveItem('Dashboard')}
+            />
+            <SidebarItem 
+              icon={Calendar} 
+              text="Calendar" 
+              active={activeItem === 'Calendar'}
+              onClick={() => setActiveItem('Calendar')}
+            />
+            <SidebarItem 
+              icon={Users} 
+              text="Team" 
+              active={activeItem === 'Team'}
+              onClick={() => setActiveItem('Team')}
+            />
+            <SidebarItem 
+              icon={MessageSquare} 
+              text="Messages" 
+              active={activeItem === 'Messages'}
+              onClick={() => setActiveItem('Messages')}
+            />
+            <SidebarItem 
+              icon={Settings} 
+              text="Settings" 
+              active={activeItem === 'Settings'}
+              onClick={() => setActiveItem('Settings')}
+            />
+          </nav>
+
+          {/* Bottom Section */}
+          <div className="p-4 border-t border-gray-200 space-y-2">
+            {isOpen ? (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <User className="w-8 h-8 text-black bg-gray-100 p-1.5 rounded-full" />
+                  <div>
+                    <p className="text-sm font-semibold text-black">John Doe</p>
+                    <p className="text-xs text-gray-600">Admin</p>
+                  </div>
+                </div>
+                <LogOut className="w-5 h-5 text-gray-700 hover:text-black cursor-pointer" />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center space-y-3">
+                <Bell className="w-6 h-6 text-gray-700 hover:text-black cursor-pointer" />
+                <LogOut className="w-6 h-6 text-gray-700 hover:text-black cursor-pointer" />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <main 
+        className={`
+          flex-grow 
+          bg-gray-50 
+          transition-all 
+          duration-500 
+          ease-in-out
+          ${isOpen ? 'ml-64' : 'ml-20'}
+          overflow-y-auto
+          p-6
+        `}
+      >
+        {children}
+        {/* {componentMap[activeItem]} */}
+      </main>
+    </div>
+  );
+};
+
+export default Sidebar;
