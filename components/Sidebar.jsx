@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+"use client"
+import React, { useState, useEffect } from 'react';
+import { signOut } from "firebase/auth";
+import { auth } from "../database/firebase"
 import { 
-  Home, 
-  Calendar, 
+  ListTodo, 
+  MessagesSquare, 
   Settings, 
-  Users, 
+  BugOff, 
   MessageSquare, 
   ChevronRight, 
   ChevronLeft,
@@ -15,19 +18,45 @@ import {
 
 import AllTasks from "@/components/AllTasks"
 import ChatSection from "@/components/ChatSection"
+import BugsTracker from "@/components/BugsTracker"
+
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from "next/navigation";
 
 
 const Sidebar = ({ children }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [activeItem, setActiveItem] = useState('AllTasks');
 
+  const context_auth = useAuth();
+  const { user, loading } = context_auth;
+  console.log(user)
+  const router = useRouter();
+  useEffect(() => {
+          if (!loading && !user) {
+            router.push("/"); 
+          }
+        }, [user, loading, router]);
+      
+  if (loading) return <p>Loading...</p>;
+
+  const logout = () => {
+      signOut(auth).then(() => {
+        alert("Logged Out")
+      }).catch((error) => {
+        alert(error)
+      });
+  }
+  
+
   const componentMap = {
     'AllTasks': <AllTasks />,
     'ChatSection': <ChatSection />,
-    // 'Team': <TeamComponent />,
+    'BugsTracker': <BugsTracker />,
     // 'Messages': <MessagesComponent />,
     // 'Settings': <SettingsComponent />
   };
+
 
   const SidebarItem = ({ icon: Icon, text, active, onClick }) => (
     <div 
@@ -164,6 +193,10 @@ const Sidebar = ({ children }) => {
     </div>
   );
 
+  if (!user) {
+    return null;
+}
+
   return (
     <div className="flex h-screen bg-white overflow-hidden">
       {/* Sidebar */}
@@ -217,22 +250,22 @@ const Sidebar = ({ children }) => {
           {/* Navigation */}
           <nav className="flex-grow px-2 overflow-y-auto">
             <SidebarItem 
-              icon={Home} 
-              text="Dashboard" 
+              icon={ListTodo} 
+              text="Task Board" 
               active={activeItem === 'Dashboard'}
               onClick={() => setActiveItem('Dashboard')}
             />
             <SidebarItem 
-              icon={Calendar} 
-              text="Calendar" 
+              icon={MessagesSquare} 
+              text="Chat Room" 
               active={activeItem === 'Calendar'}
               onClick={() => setActiveItem('ChatSection')}
             />
             <SidebarItem 
-              icon={Users} 
-              text="Team" 
+              icon={BugOff} 
+              text="Track Bugs" 
               active={activeItem === 'Team'}
-              onClick={() => setActiveItem('Team')}
+              onClick={() => setActiveItem('BugsTracker')}
             />
             <SidebarItem 
               icon={MessageSquare} 
@@ -255,16 +288,16 @@ const Sidebar = ({ children }) => {
                 <div className="flex items-center space-x-3">
                   <User className="w-8 h-8 text-black bg-gray-100 p-1.5 rounded-full" />
                   <div>
-                    <p className="text-sm font-semibold text-black">John Doe</p>
-                    <p className="text-xs text-gray-600">Admin</p>
+                    <p className="text-sm font-semibold text-black">{user.email.split('@')[0]}</p>
+                    <p className="text-xs text-gray-600">Intern</p>
                   </div>
                 </div>
-                <LogOut className="w-5 h-5 text-gray-700 hover:text-black cursor-pointer" />
+                <LogOut onClick={() => logout()} className="w-5 h-5 text-gray-700 hover:text-black cursor-pointer" />
               </div>
             ) : (
               <div className="flex flex-col items-center space-y-3">
                 <Bell className="w-6 h-6 text-gray-700 hover:text-black cursor-pointer" />
-                <LogOut className="w-6 h-6 text-gray-700 hover:text-black cursor-pointer" />
+                <LogOut onClick={() => logout()} className="w-6 h-6 text-gray-700 hover:text-black cursor-pointer"/>
               </div>
             )}
           </div>

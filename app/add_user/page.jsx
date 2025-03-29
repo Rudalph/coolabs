@@ -24,15 +24,16 @@ const page = () => {
       }, [user, loading, router]);
     
     if (loading) return <p>Loading...</p>;
+
+    if (!user) {
+      return null;
+  }
     return (
       <>
       <div className='flex justify-center items-center gap-6 w-full h-screen'>
             <AddUserModal />
             <AddTaskModal />
             <Logout />
-        </div>
-        <div>
-          <Idcard />
         </div>
       </>
     )
