@@ -3,9 +3,16 @@
 // import { useAuth } from "../context/AuthContext";
 // import { useRouter } from 'next/navigation';
 // import { sendMessage, fetchMessages } from '../app/api/chat_section/route';
-// import { Send, MessageCircle } from 'lucide-react';
+// import { 
+//   Send, 
+//   MessageCircle, 
+//   User, 
+//   Clock, 
+//   CheckCircle2 
+// } from 'lucide-react';
+// import { motion, AnimatePresence } from 'framer-motion';
 
-// const ChatSection = () => {
+// const ChatComponent = () => {
 //   // Authentication Context
 //   const auth = useAuth();
 //   const { user, loading } = auth;
@@ -63,58 +70,77 @@
 //   if (!user) return null;
 
 //   return (
-//     <div className="flex flex-col h-screen bg-gray-100">
+//     <div className="flex flex-col h-[90vh] lg:max-w-4xl max-w-xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden lg:mt-5">
 //       {/* Chat Header */}
-//       <div className="bg-white shadow-md p-4 flex items-center">
-//         <MessageCircle className="mr-2 text-blue-600" />
-//         <h2 className="text-xl font-semibold text-gray-800">
-//           Chat Room
-//         </h2>
+//       <div className="bg-neutral-100 p-4 flex items-center justify-between border-b border-neutral-200">
+//         <div className="flex items-center space-x-3">
+//           <MessageCircle className="h-6 w-6 text-neutral-700" />
+//           <h2 className="text-lg font-semibold text-neutral-800">
+//             Chat Room
+//           </h2>
+//         </div>
+//         <div className="flex items-center space-x-2">
+//           <User className="h-5 w-5 text-neutral-600" />
+//           <span className="text-sm text-neutral-700 truncate max-w-[150px]">
+//             {user.email}
+//           </span>
+//         </div>
 //       </div>
 
 //       {/* Messages Container */}
-//       <div className="flex-grow overflow-y-auto p-4 space-y-4">
-//         {messages.map((msg) => (
-//           <div 
-//             key={msg.id} 
-//             className={`flex flex-col ${
-//               msg.user === user.email 
-//                 ? 'items-end' 
-//                 : 'items-start'
-//             }`}
-//           >
-//             <div 
-//               className={`max-w-[70%] px-4 py-2 rounded-lg ${
+//       <div className="flex-grow overflow-y-auto p-4 space-y-3 bg-neutral-50">
+//         <AnimatePresence>
+//           {messages.map((msg) => (
+//             <motion.div 
+//               key={msg.id} 
+//               initial={{ opacity: 0, y: 20 }}
+//               animate={{ opacity: 1, y: 0 }}
+//               exit={{ opacity: 0, y: -20 }}
+//               className={`flex flex-col ${
 //                 msg.user === user.email 
-//                   ? 'bg-blue-500 text-white' 
-//                   : 'bg-gray-200 text-gray-800'
+//                   ? 'items-end' 
+//                   : 'items-start'
 //               }`}
 //             >
-//               <div className="text-xs mb-1 opacity-75">
-//                 {msg.user === user.email ? 'You' : msg.user}
+//               <div 
+//                 className={`max-w-[80%] px-3 py-2 rounded-lg shadow-sm ${
+//                   msg.user === user.email 
+//                     ? 'bg-neutral-800 text-white' 
+//                     : 'bg-white text-neutral-800 border border-neutral-200'
+//                 }`}
+//               >
+//                 <div className="flex items-center justify-between mb-1">
+//                   <span className="text-xs opacity-70 flex items-center">
+//                     {msg.user === user.email ? 'You' : msg.user.split('@')[0]}
+//                     {msg.user === user.email && <CheckCircle2 className="ml-1 h-3 w-3 text-blue-400" />}
+//                   </span>
+//                   {msg.timestamp && (
+//                     <Clock className="h-3 w-3 opacity-50" />
+//                   )}
+//                 </div>
+//                 {msg.text}
 //               </div>
-//               {msg.text}
-//             </div>
-//           </div>
-//         ))}
+//             </motion.div>
+//           ))}
+//         </AnimatePresence>
 //         <div ref={messagesEndRef} />
 //       </div>
 
 //       {/* Message Input */}
 //       <form 
 //         onSubmit={handleSendMessage} 
-//         className="bg-white p-4 border-t flex items-center"
+//         className="bg-white p-3 border-t border-neutral-200 flex items-center space-x-2"
 //       >
 //         <input 
 //           type="text"
 //           value={newMessage}
 //           onChange={(e) => setNewMessage(e.target.value)}
 //           placeholder="Type a message..."
-//           className="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+//           className="flex-grow p-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-500"
 //         />
 //         <button 
 //           type="submit" 
-//           className="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600 transition"
+//           className="bg-neutral-800 text-white p-2 rounded-lg hover:bg-neutral-700 transition flex items-center"
 //         >
 //           <Send className="h-5 w-5" />
 //         </button>
@@ -123,13 +149,21 @@
 //   );
 // };
 
-// export default ChatSection;
+// export default ChatComponent;
 
+
+// ChatSection.jsx
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { useAuth } from "../context/AuthContext";
-import { useRouter } from 'next/navigation';
-import { sendMessage, fetchMessages } from '../app/api/chat_section/route';
+import { useAuth } from "../context/AuthContext"; // Adjust import path as needed
+import { useRouter } from 'next/navigation'; // Make sure to use next/navigation in App Router
+import { 
+  collection, 
+  query, 
+  orderBy, 
+  onSnapshot 
+} from 'firebase/firestore';
+import { db } from '../database/firebase'; // Adjust path to your firebase config
 import { 
   Send, 
   MessageCircle, 
@@ -139,7 +173,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const ChatComponent = () => {
+const ChatSection = () => {
   // Authentication Context
   const auth = useAuth();
   const { user, loading } = auth;
@@ -163,15 +197,22 @@ const ChatComponent = () => {
       return;
     }
 
-    // Fetch messages
-    const unsubscribe = fetchMessages((fetchedMessages) => {
+    // Set up Firestore listener for messages
+    const messagesRef = collection(db, 'messages');
+    const q = query(messagesRef, orderBy('timestamp', 'asc'));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedMessages = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
       setMessages(fetchedMessages);
+    }, (error) => {
+      console.error('Error fetching messages:', error);
     });
 
     // Cleanup subscription
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
+    return () => unsubscribe();
   }, [user, loading, router]);
 
   // Auto-scroll on new messages
@@ -186,7 +227,21 @@ const ChatComponent = () => {
     if (!newMessage.trim() || !user) return;
 
     try {
-      await sendMessage(newMessage, user);
+      const response = await fetch('/api/chat_section', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          message: newMessage, 
+          userEmail: user.email 
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
       setNewMessage('');
     } catch (error) {
       console.error('Message send failed:', error);
@@ -197,7 +252,7 @@ const ChatComponent = () => {
   if (!user) return null;
 
   return (
-    <div className="flex flex-col h-[90vh] lg:max-w-4xl max-w-xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden lg:mt-5">
+    <div className="flex flex-col h-[90vh] lg:max-w-5xl max-w-xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden">
       {/* Chat Header */}
       <div className="bg-neutral-100 p-4 flex items-center justify-between border-b border-neutral-200">
         <div className="flex items-center space-x-3">
@@ -276,4 +331,4 @@ const ChatComponent = () => {
   );
 };
 
-export default ChatComponent;
+export default ChatSection;
