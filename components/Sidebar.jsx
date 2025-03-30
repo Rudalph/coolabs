@@ -268,12 +268,12 @@ const Sidebar = ({ children }) => {
               active={activeItem === 'BugsTracker'}
               onClick={() => setActiveItem('BugsTracker')}
             />
-            <SidebarItem 
+            {/* <SidebarItem 
               icon={MessageSquare} 
               text="Messages" 
               active={activeItem === 'Messages'}
               onClick={() => setActiveItem('Messages')}
-            />
+            /> */}
             <SidebarItem 
               icon={NotebookPen} 
               text="Notice Board" 
