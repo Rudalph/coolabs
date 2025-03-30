@@ -5,7 +5,7 @@ import { auth } from "../database/firebase"
 import { 
   ListTodo, 
   MessagesSquare, 
-  Settings, 
+  NotebookPen, 
   BugOff, 
   MessageSquare, 
   ChevronRight, 
@@ -19,6 +19,7 @@ import {
 import AllTasks from "@/components/AllTasks"
 import ChatSection from "@/components/ChatSection"
 import BugsTracker from "@/components/BugsTracker"
+import AllNotices from './AllNotices';
 
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from "next/navigation";
@@ -53,7 +54,7 @@ const Sidebar = ({ children }) => {
     'AllTasks': <AllTasks />,
     'ChatSection': <ChatSection />,
     'BugsTracker': <BugsTracker />,
-    // 'Messages': <MessagesComponent />,
+    'AllNotices': <AllNotices />,
     // 'Settings': <SettingsComponent />
   };
 
@@ -258,13 +259,13 @@ const Sidebar = ({ children }) => {
             <SidebarItem 
               icon={MessagesSquare} 
               text="Chat Room" 
-              active={activeItem === 'Calendar'}
+              active={activeItem === 'ChatSection'}
               onClick={() => setActiveItem('ChatSection')}
             />
             <SidebarItem 
               icon={BugOff} 
               text="Track Bugs" 
-              active={activeItem === 'Team'}
+              active={activeItem === 'BugsTracker'}
               onClick={() => setActiveItem('BugsTracker')}
             />
             <SidebarItem 
@@ -274,10 +275,10 @@ const Sidebar = ({ children }) => {
               onClick={() => setActiveItem('Messages')}
             />
             <SidebarItem 
-              icon={Settings} 
-              text="Settings" 
-              active={activeItem === 'Settings'}
-              onClick={() => setActiveItem('Settings')}
+              icon={NotebookPen} 
+              text="Notice Board" 
+              active={activeItem === 'AllNotices'}
+              onClick={() => setActiveItem('AllNotices')}
             />
           </nav>
 
