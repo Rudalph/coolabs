@@ -1,5 +1,5 @@
 import { db } from "../../../database/firebase";
-import { collection, getDocs, query, orderBy, where } from "firebase/firestore";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
 
 export async function GET() {
   try {
