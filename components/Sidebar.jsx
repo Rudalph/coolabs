@@ -253,8 +253,8 @@ const Sidebar = ({ children }) => {
             <SidebarItem 
               icon={ListTodo} 
               text="Task Board" 
-              active={activeItem === 'Dashboard'}
-              onClick={() => setActiveItem('Dashboard')}
+              active={activeItem === 'AllTasks'}
+              onClick={() => setActiveItem('AllTasks')}
             />
             <SidebarItem 
               icon={MessagesSquare} 
