@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "../../../database/firebase"; // Import initialized Firebase Auth
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 export async function POST(req) {
   try {
@@ -28,6 +29,17 @@ export async function POST(req) {
     
     // You could add additional user setup here if needed
     // For example, setting display name, adding to Firestore database, etc.
+
+    await setDoc(doc(db, "users", user.uid), {
+      uid: user.uid,
+      email: user.email,
+      displayName: displayName || user.email.split('@')[0],
+      photoURL: user.photoURL || null,
+      createdAt: serverTimestamp(),
+      lastSeen: serverTimestamp(),
+      isOnline: true,
+      incomingCall: null
+    });
     
     return NextResponse.json(
       { 
