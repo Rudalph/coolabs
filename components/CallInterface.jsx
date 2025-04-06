@@ -24,9 +24,19 @@ export default function CallInterface() {
   const servers = {
     iceServers: [
       {
-        urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
+        urls: [
+          'stun:stun1.l.google.com:19302',
+          'stun:stun2.l.google.com:19302',
+        ],
       },
+      // Add a free TURN server for reliable connections
+      {
+        urls: 'turn:openrelay.metered.ca:80',
+        username: 'openrelayproject',
+        credential: 'openrelayproject',
+      }
     ],
+    iceCandidatePoolSize: 10,
   };
 
   // Fetch available users
@@ -46,56 +56,71 @@ export default function CallInterface() {
   }, [user]);
 
   // Initialize WebRTC when a call starts
-  const setupWebRTC = async () => {
-    try {
-      // Get local media stream
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: true, 
-        audio: true 
-      });
-      
-      setLocalStream(stream);
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = stream;
+// 1. Fix getUserMedia permissions and stream handling
+const setupWebRTC = async () => {
+  try {
+    // More explicit constraints for better device compatibility
+    const stream = await navigator.mediaDevices.getUserMedia({ 
+      video: {
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        facingMode: "user"
+      }, 
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true
       }
-
-      // Create peer connection
-      const peerConnection = new RTCPeerConnection(servers);
-      peerConnectionRef.current = peerConnection;
-
-      // Add local tracks to peer connection
-      stream.getTracks().forEach(track => {
-        peerConnection.addTrack(track, stream);
-      });
-
-      // Set up remote stream handlers
-      peerConnection.ontrack = (event) => {
-        const remoteMediaStream = new MediaStream();
-        event.streams[0].getTracks().forEach(track => {
-          remoteMediaStream.addTrack(track);
-        });
-        setRemoteStream(remoteMediaStream);
-        if (remoteVideoRef.current) {
-          remoteVideoRef.current.srcObject = remoteMediaStream;
-        }
-      };
-
-      // Set up ICE candidate handling
-      peerConnection.onicecandidate = (event) => {
-        if (event.candidate && user && selectedUser) {
-          // Make sure both user and selectedUser exist before accessing their uid properties
-          const callDoc = doc(db, 'calls', `${user.uid}_${selectedUser.uid}`);
-          const candidatesCollection = collection(callDoc, `${user.uid}Candidates`);
-          setDoc(doc(candidatesCollection), event.candidate.toJSON());
-        }
-      };
-
-      return peerConnection;
-    } catch (error) {
-      console.error("Error setting up WebRTC:", error);
-      return null;
+    });
+    
+    // Ensure streams are set and attached to video elements IMMEDIATELY
+    setLocalStream(stream);
+    if (localVideoRef.current) {
+      localVideoRef.current.srcObject = stream;
+      // Force video element to play 
+      localVideoRef.current.play().catch(e => console.error("Error playing local video:", e));
     }
-  };
+
+    // Create peer connection
+    const peerConnection = new RTCPeerConnection(servers);
+    peerConnectionRef.current = peerConnection;
+
+    // Add tracks one by one to ensure proper handling
+    stream.getTracks().forEach(track => {
+      console.log(`Adding track: ${track.kind}`, track);
+      peerConnection.addTrack(track, stream);
+    });
+
+    // Improved remote stream handling
+    peerConnection.ontrack = (event) => {
+      console.log("Remote track received:", event.track.kind);
+      if (!remoteVideoRef.current) return;
+      
+      // Create and set remote stream immediately when tracks arrive
+      const remoteStream = remoteVideoRef.current.srcObject instanceof MediaStream 
+        ? remoteVideoRef.current.srcObject 
+        : new MediaStream();
+        
+      // Add this specific track to the stream
+      remoteStream.addTrack(event.track);
+      
+      // Set the remote video source and force play
+      remoteVideoRef.current.srcObject = remoteStream;
+      remoteVideoRef.current.play().catch(e => console.error("Error playing remote video:", e));
+      setRemoteStream(remoteStream);
+    };
+
+    // Debug ice connection state changes
+    peerConnection.oniceconnectionstatechange = () => {
+      console.log("ICE Connection State:", peerConnection.iceConnectionState);
+    };
+
+    return peerConnection;
+  } catch (error) {
+    console.error("Error setting up WebRTC:", error);
+    alert(`Media access error: ${error.message}. Please check camera/mic permissions.`);
+    return null;
+  }
+};
 
   // Start a call to selected user
   const startCall = async () => {
@@ -313,25 +338,26 @@ export default function CallInterface() {
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="relative rounded-md overflow-hidden bg-gray-100 aspect-video">
-              <video
-                ref={localVideoRef}
-                autoPlay
-                playsInline
-                muted
-                className="w-full h-full object-cover"
-              />
+            <video
+  ref={localVideoRef}
+  autoPlay
+  playsInline
+  muted
+  className="w-full h-full object-cover"
+  style={{ transform: 'scaleX(-1)' }} // Mirror selfie view
+/>
               <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
                 You {isMuted && '(Muted)'} {isVideoOff && '(Video Off)'}
               </div>
             </div>
             
             <div className="relative rounded-md overflow-hidden bg-gray-100 aspect-video">
-              <video
-                ref={remoteVideoRef}
-                autoPlay
-                playsInline
-                className="w-full h-full object-cover"
-              />
+            <video
+  ref={remoteVideoRef}
+  autoPlay
+  playsInline
+  className="w-full h-full object-cover"
+/>
               <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
                 {selectedUser?.displayName || selectedUser?.email}
               </div>
