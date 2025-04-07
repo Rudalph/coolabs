@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "../../../database/firebase"; // Import initialized Firebase Auth
+import { auth, db } from "../../../database/firebase"; // Import initialized Firebase Auth
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 

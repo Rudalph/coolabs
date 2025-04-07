@@ -91,23 +91,29 @@ const setupWebRTC = async () => {
     });
 
     // Improved remote stream handling
-    peerConnection.ontrack = (event) => {
-      console.log("Remote track received:", event.track.kind);
-      if (!remoteVideoRef.current) return;
-      
-      // Create and set remote stream immediately when tracks arrive
-      const remoteStream = remoteVideoRef.current.srcObject instanceof MediaStream 
-        ? remoteVideoRef.current.srcObject 
-        : new MediaStream();
-        
-      // Add this specific track to the stream
-      remoteStream.addTrack(event.track);
-      
-      // Set the remote video source and force play
-      remoteVideoRef.current.srcObject = remoteStream;
-      remoteVideoRef.current.play().catch(e => console.error("Error playing remote video:", e));
-      setRemoteStream(remoteStream);
-    };
+    // Improved remote stream handling
+peerConnection.ontrack = (event) => {
+  console.log("Remote track received:", event.track.kind);
+  
+  // Use a single MediaStream instance for all tracks
+  const newRemoteStream = new MediaStream();
+  
+  // Add all tracks from the event to our stream
+  event.streams[0].getTracks().forEach(track => {
+    newRemoteStream.addTrack(track);
+  });
+  
+  // Set the remote stream state only once
+  setRemoteStream(newRemoteStream);
+  
+  // Update the video element after a short delay
+  setTimeout(() => {
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = newRemoteStream;
+      // Don't explicitly call play() - let the autoPlay attribute handle it
+    }
+  }, 100);
+};
 
     // Debug ice connection state changes
     peerConnection.oniceconnectionstatechange = () => {
@@ -356,6 +362,7 @@ const setupWebRTC = async () => {
   ref={remoteVideoRef}
   autoPlay
   playsInline
+  muted={false}
   className="w-full h-full object-cover"
 />
               <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
