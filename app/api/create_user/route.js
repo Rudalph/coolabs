@@ -33,7 +33,7 @@ export async function POST(req) {
     await setDoc(doc(db, "users", user.uid), {
       uid: user.uid,
       email: user.email,
-      displayName: displayName || user.email.split('@')[0],
+      displayName: user.displayName || user.email.split('@')[0],
       photoURL: user.photoURL || null,
       createdAt: serverTimestamp(),
       lastSeen: serverTimestamp(),

@@ -25,7 +25,7 @@ const Login = () => {
       const userCredential = await signInWithEmailAndPassword(auth, username, password);
       const firebaseUser = userCredential.user;
       setUser(firebaseUser)
-      if(firebaseUser.email === "rudalph.gonsalves@medisense.com"){
+      if(firebaseUser.email === "rudalph.gonsalves@zenithzest.tech"){
         router.push("/add_user");
       }else{
         router.push("/user_idcard");

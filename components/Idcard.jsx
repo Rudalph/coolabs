@@ -35,7 +35,7 @@ const Idcard = () => {
             <div className="w-96 bg-white rounded-2xl shadow-2xl border border-black border-opacity-10 overflow-hidden">
                 {/* Header */}
                 <div className="bg-black text-white text-center py-4">
-                    <h2 className="text-2xl font-bold">Creative TechScapes</h2>
+                    <h2 className="text-2xl font-bold">ZenithZest Technologies</h2>
                 </div>
 
                 {/* Profile Section */}
@@ -46,9 +46,15 @@ const Idcard = () => {
                     
                     <div className="text-center">
                         <p className="text-xl font-bold text-black mb-1">
-                            {user.displayName || 'Employee'}
+                                   {user?.email
+                                    ? user.email
+                                        .split('@')[0]
+                                        .split('.')
+                                        .map(name => name.charAt(0).toUpperCase() + name.slice(1))
+                                        .join(' ')
+                                    : 'Engineer'}
                         </p>
-                        <p className="text-sm text-gray-700 mb-4">{user.email}</p>
+                        <p className="text-sm text-gray-700 mb-4">Engineer</p>
                     </div>
 
                     {/* Details Section */}
@@ -61,20 +67,20 @@ const Idcard = () => {
                         <div className="flex items-center space-x-3">
                             <Building2 className="w-5 h-5 text-black text-opacity-60" />
                             <p className="text-sm text-black">
-                                <span className="font-semibold">Designation:</span> Intern
+                                <span className="font-semibold">Designation:</span> Software Engineer
                             </p>
                         </div>
                         
                         <div className="flex items-center space-x-3">
                             <Building2 className="w-5 h-5 text-black text-opacity-60" />
                             <p className="text-sm text-black">
-                                <span className="font-semibold">Department:</span> Engineering
+                                <span className="font-semibold">Department:</span> Software Engineering
                             </p>
                         </div>
                         
                         <div className="flex items-center space-x-3">
                             <MapPin className="w-5 h-5 text-black text-opacity-60" />
-                            <p className="text-sm text-black">Mumbai, Maharashtra</p>
+                            <p className="text-sm text-black">Dublin, Ireland</p>
                         </div>
                     </div>
                 </div>

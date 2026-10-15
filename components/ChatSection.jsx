@@ -264,7 +264,13 @@ const ChatSection = () => {
         <div className="flex items-center space-x-2">
           <User className="h-5 w-5 text-neutral-600" />
           <span className="text-sm text-neutral-700 truncate max-w-[150px]">
-            {user.email}
+                    {user?.email
+                    ? user.email
+                        .split('@')[0]
+                        .split('.')
+                        .map(name => name.charAt(0).toUpperCase() + name.slice(1))
+                        .join(' ')
+                    : 'Engineer'}
           </span>
         </div>
       </div>

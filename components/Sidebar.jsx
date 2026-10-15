@@ -289,8 +289,16 @@ const Sidebar = ({ children }) => {
                 <div className="flex items-center space-x-3">
                   <User className="w-8 h-8 text-black bg-gray-100 p-1.5 rounded-full" />
                   <div>
-                    <p className="text-sm font-semibold text-black">{user.email.split('@')[0]}</p>
-                    <p className="text-xs text-gray-600">Intern</p>
+                    <p className="text-sm font-semibold text-black">
+                              {user?.email
+                              ? user.email
+                                  .split('@')[0]
+                                  .split('.')
+                                  .map(name => name.charAt(0).toUpperCase() + name.slice(1))
+                                  .join(' ')
+                              : 'Engineer'}
+                    </p>
+                    <p className="text-xs text-gray-600">Engineer</p>
                   </div>
                 </div>
                 <LogOut onClick={() => logout()} className="w-5 h-5 text-gray-700 hover:text-black cursor-pointer" />
